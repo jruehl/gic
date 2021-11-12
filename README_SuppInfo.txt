@@ -1,10 +1,7 @@
-The supporting material includes a pdf file with additional simulation results 
-and R scripts that can be used to reproduce the numerical results in the manuscript
+The R scripts can be used to reproduce the numerical results in the manuscript
 'General Independent Censoring in Event-Driven Trials with Staggered Entry' 
-(Rühl, Beyersmann, and Friedrich):
+(Rühl, Beyersmann, Friedrich):
 
-- The document 'Additional_Results.pdf' provides additional results of the simulations 
-  described in the main text.
 - The script 'Simulations_calendar_times.R' includes the R code to reproduce the 
   results of the first simulation study.
 - The sript 'Breslow_estimators.R' includes the R code to reproduce the shadow plots 
