@@ -1,6 +1,5 @@
-The R scripts can be used to reproduce the numerical results in the manuscript
-'General Independent Censoring in Event-Driven Trials with Staggered Entry' 
-(Rühl, Beyersmann, Friedrich):
+The R scripts in this repository can be used to reproduce the numerical results in the manuscript
+'General Independent Censoring in Event-Driven Trials with Staggered Entry' (Rühl, Beyersmann, Friedrich):
 
 - The script 'Simulations_calendar_times.R' includes the R code to reproduce the 
   results of the first simulation study.
