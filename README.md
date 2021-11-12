@@ -8,7 +8,7 @@ The R scripts in this repository can be used to reproduce the numerical results 
 - The script 'Simulations_bootstrap.R' includes the R code to reproduce the results of
   the second simulation study.
 
-############################################
+---
 
 R version 3.5.1 (2018-07-02)
 Platform: x86_64-w64-mingw32/x64 (64-bit)
