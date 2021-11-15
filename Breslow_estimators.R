@@ -68,6 +68,57 @@ for(i in 1:6){
   }
 }
 
+rm(list = c("breslow_list", "breslow", "matrix", "cl", "mean_median", "i", "j", "k"))
+
+
+# compute bias at selected time points #########################################
+
+mean_bias1 <- mean_bias2 <- mean_bias3 <- mean_bias4 <- mean_bias5 <- mean_bias6 <- matrix(NA, nrow = 3, ncol = 3)
+median_bias1 <- median_bias2 <- median_bias3 <- median_bias4 <- median_bias5 <- median_bias6 <- matrix(NA, nrow = 3, ncol = 3)
+RMSE1 <- RMSE2 <- RMSE3 <- RMSE4 <- RMSE5 <- RMSE6 <- matrix(NA, nrow = 3, ncol = 3)
+for(j in 1:6){
+  times <- switch(j, 
+                  c(0.3, 0.6, 0.9),
+                  c(0.1, 0.2, 0.3),
+                  c(0.3, 0.6, 0.9),
+                  c(0.2, 0.45, 0.7),
+                  c(0.03, 0.05, 0.07),
+                  c(0.2, 0.45, 0.7)
+  )
+  exp <- switch(j, 1, 1, 1, 0.5, 0.5, 0.5)
+  i <- 1
+  for(t in times){
+    
+    eval(parse(text=paste0("mean_bias", j, "[", i, ",1] <- breslow_standard_", j, "_mean_median[findInterval(t, breslow_standard_", j, "_mean_median$time),'mean'] - t^exp")))
+    eval(parse(text=paste0("mean_bias", j, "[", i, ",2] <- breslow_model1_", j, "_mean_median[findInterval(t, breslow_model1_", j, "_mean_median$time),'mean'] - t^exp")))
+    eval(parse(text=paste0("mean_bias", j, "[", i, ",3] <- breslow_model2_", j, "_mean_median[findInterval(t, breslow_model2_", j, "_mean_median$time),'mean'] - t^exp")))
+    
+    eval(parse(text=paste0("median_bias", j, "[", i, ",1] <- breslow_standard_", j, "_mean_median[findInterval(t, breslow_standard_", j, "_mean_median$time),'median'] - t^exp")))
+    eval(parse(text=paste0("median_bias", j, "[", i, ",2] <- breslow_model1_", j, "_mean_median[findInterval(t, breslow_model1_", j, "_mean_median$time),'median'] - t^exp")))
+    eval(parse(text=paste0("median_bias", j, "[", i, ",3] <- breslow_model2_", j, "_mean_median[findInterval(t, breslow_model2_", j, "_mean_median$time),'median'] - t^exp")))
+    
+    eval(parse(text=paste0("RMSE", j, "[", i, ",1] <- sqrt(mean(breslow_standard_", j, " %>% group_by(iter) %>% filter(time <= t) %>% filter(time == max(time)) %>% pull(hazard) - t^exp)^2)")))
+    eval(parse(text=paste0("RMSE", j, "[", i, ",2] <- sqrt(mean(breslow_model1_", j, " %>% group_by(iter) %>% filter(time <= t) %>% filter(time == max(time)) %>% pull(hazard) - t^exp)^2)")))
+    eval(parse(text=paste0("RMSE", j, "[", i, ",3] <- sqrt(mean(breslow_model2_", j, " %>% group_by(iter) %>% filter(time <= t) %>% filter(time == max(time)) %>% pull(hazard) - t^exp)^2)")))
+    
+    i <- i + 1
+  }
+}
+colnames(mean_bias1) <- colnames(mean_bias2) <- colnames(mean_bias3) <- colnames(mean_bias4) <- colnames(mean_bias5) <- colnames(mean_bias6) <- 
+  c("Standard Model", "Model 1", "Model 2")
+colnames(median_bias1) <- colnames(median_bias2) <- colnames(median_bias3) <- colnames(median_bias4) <- colnames(median_bias5) <- colnames(median_bias6) <- 
+  c("Standard Model", "Model 1", "Model 2")
+colnames(RMSE1) <- colnames(RMSE2) <- colnames(RMSE3) <- colnames(RMSE4) <- colnames(RMSE5) <- colnames(RMSE6) <- 
+  c("Standard Model", "Model 1", "Model 2")
+
+
+# create shadowplots ###########################################################
+
+library(ggplot2)
+library(gridExtra)
+library(grid)
+library(cowplot)
+
 # select 2000 random iterations from each scenario
 set.seed(123456)
 for(i in 1:6){
@@ -78,16 +129,6 @@ for(i in 1:6){
   }
   assign(paste0("sample_", i), sample, envir = .GlobalEnv)
 }
-
-rm(list = c("breslow_list", "breslow", "matrix", "indicator_list", "cl", "mean_median", "i", "j", "k", "sample"))
-
-
-# create shadowplots ###########################################################
-
-library(ggplot2)
-library(gridExtra)
-library(grid)
-library(cowplot)
 
 # create shadow plots
 shadowplots <- function(breslow_standard, breslow_standard_mean_median, 
