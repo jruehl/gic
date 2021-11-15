@@ -7,6 +7,8 @@ The R scripts in this repository can be used to reproduce the numerical results 
   of the Breslow estimators based on the output of 'Simulations_calendar_times.R'.
 - The script 'Simulations_bootstrap.R' includes the R code to reproduce the results of
   the second simulation study.
+  
+The simulated results are stored in the folder 'Outcomes', respectively.
 
 ---
 
