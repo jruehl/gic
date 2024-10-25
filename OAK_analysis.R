@@ -69,6 +69,7 @@ EBS_two_state <- function(data_original, survfit_original, times, BS_iter = 1000
     else 
       CI_EBS[i,3:4] <- 0
   }
+  CI_EBS[,3] <- pmin(1, CI_EBS[,3])
   CI_EBS[,4] <- pmin(1, CI_EBS[,4])
   
   return(CI_EBS)
@@ -141,6 +142,7 @@ WBS_two_state <- function(survfit_original, times, BS_iter = 1000){
     else 
       CI_WBS[i,3:4] <- 0
   }
+  CI_WBS[,3] <- pmin(1, CI_WBS[,3])
   CI_WBS[,4] <- pmin(1, CI_WBS[,4])
   
   return(CI_WBS)
