@@ -239,6 +239,38 @@ CI_WBS_docetaxel_12 <- WBS(data[data$treatment == "Docetaxel",],
                            unique(sort(data$exit)), 
                            "1", "2", TRUE, TRUE, 1000)
 
+## create data subsets ####
+for(m in c(75, 50, 40)){
+  
+  set.seed(9399234)
+  assign(paste0("OAK_subset_", m), data.frame())
+  while(sum(1-eval(parse(text = paste0("OAK_subset_", m, "$OS_cnsr")))) < m){
+    assign(paste0("OAK_subset_", m),
+           rbind(eval(parse(text = paste0("OAK_subset_", m))), 
+                 OAK[OAK$id == sample(x = setdiff(OAK$id, eval(parse(text = paste0("OAK_subset_", m, "$id")))), size = 1),]))
+  }
+  assign(paste0("OAK_atezolizumab_subset_", m), 
+         data.frame(
+           time = eval(parse(text = paste0("OAK_subset_", m, "[OAK_subset_", m, "$treatment == 'MPDL3280A','OS']"))), 
+           status = 1 - eval(parse(text = paste0("OAK_subset_", m, "[OAK_subset_", m, "$treatment == 'MPDL3280A','OS_cnsr']")))))
+  assign(paste0("OAK_docetaxel_subset_", m), 
+         data.frame(
+           time = eval(parse(text = paste0("OAK_subset_", m, "[OAK_subset_", m, "$treatment == 'Docetaxel','OS']"))), 
+           status = 1 - eval(parse(text = paste0("OAK_subset_", m, "[OAK_subset_", m, "$treatment == 'Docetaxel','OS_cnsr']")))))
+  assign(paste0("survfit_atezolizumab_subset_", m),
+         survfit(Surv(time, status) ~ 1, eval(parse(text = paste0("OAK_atezolizumab_subset_", m)))))
+  assign(paste0("survfit_docetaxel_subset_", m),
+         survfit(Surv(time, status) ~ 1, eval(parse(text = paste0("OAK_docetaxel_subset_", m)))))
+  assign(paste0("CI_EBS_atezolizumab_subset_", m),
+         eval(parse(text = paste0("EBS(OAK_atezolizumab_subset_", m, ", survfit_atezolizumab_subset_", m, ", sort(unique(OAK_subset_", m, "$OS)))"))))
+  assign(paste0("CI_EBS_docetaxel_subset_", m),
+         eval(parse(text = paste0("EBS(OAK_docetaxel_subset_", m, ", survfit_docetaxel_subset_", m, ", sort(unique(OAK_subset_", m, "$OS)))"))))
+  assign(paste0("CI_WBS_atezolizumab_subset_", m),
+         eval(parse(text = paste0("WBS(survfit_atezolizumab_subset_", m, ", sort(unique(OAK_subset_", m, "$OS)))"))))
+  assign(paste0("CI_WBS_docetaxel_subset_", m),
+         eval(parse(text = paste0("WBS(survfit_docetaxel_subset_", m, ", sort(unique(OAK_subset_", m, "$OS)))"))))
+  
+}
 
 # create plots #################################################################
 
@@ -342,3 +374,9 @@ plots(unique(sort(data$exit)), "NAE_mult", etm_atezolizumab, etm_docetaxel,
 # cumulative incidence (multi-state model)
 plots(unique(sort(data$exit)), "AJE", etm_atezolizumab, etm_docetaxel,
       CI_EBS_atezolizumab_12[,3:4], CI_EBS_docetaxel_12[,3:4], CI_WBS_atezolizumab_12[,3:4], CI_WBS_docetaxel_12[,3:4])
+
+# cumulative hazard for data subsets
+for(m in c(75, 50, 40)){
+  eval(parse(text = paste0("print(plots(unique(sort(OAK_subset_", m, "$OS)), 'NAE', survfit_atezolizumab_subset_", m, ", survfit_docetaxel_subset_", m, 
+                           ", CI_EBS_atezolizumab_subset_", m, "[,1:2], CI_EBS_docetaxel_subset_", m, "[,1:2], CI_WBS_atezolizumab_subset_", m, "[,1:2], CI_WBS_docetaxel_subset_", m, "[,1:2]))")))
+}
